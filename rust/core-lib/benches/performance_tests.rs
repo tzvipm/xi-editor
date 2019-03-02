@@ -28,7 +28,7 @@ use xi_rpc::{ReadError, RpcLoop};
 
 #[bench]
 /// Tests the handler's responsiveness to a standard startup sequence.
-fn test_startup(b: &mut Bencher) {
+fn startup_performance(b: &mut Bencher) {
     let mut state = XiCore::new();
     let (tx, mut rx) = test_channel();
     let mut rpc_looper = RpcLoop::new(tx);
@@ -36,10 +36,8 @@ fn test_startup(b: &mut Bencher) {
         r#"{"method":"client_started","params":{}}
 {"method":"set_theme","params":{"theme_name":"InspiredGitHub"}}"#,
     );
-    assert!(rpc_looper.mainloop(|| json, &mut state).is_ok());
-    rx.expect_rpc("available_languages");
-    rx.expect_rpc("available_themes");
-    rx.expect_rpc("theme_changed");
+
+    rpc_looper.mainloop(|| json, &mut state)
 
     let json = make_reader(r#"{"id":0,"method":"new_view","params":{}}"#);
     assert!(rpc_looper.mainloop(|| json, &mut state).is_ok());
